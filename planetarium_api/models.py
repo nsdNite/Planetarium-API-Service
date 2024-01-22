@@ -1,30 +1,25 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from rest_framework.authtoken.admin import User
+
+
+class ShowTheme(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
+    show_theme = models.ManyToManyField(ShowTheme, blank=True, related_name="astronomy_shows")
 
     class Meta:
         ordering = ["title"]
 
     def __str__(self) -> str:
         return self.title
-
-
-class ShowTheme(models.Model):
-    name = models.CharField(max_length=255)
-    astronomy_show = models.ManyToManyField(
-        AstronomyShow,
-        on_delete=models.CASCADE,
-        related_name="show_themes"
-    )
-
-    def __str__(self) -> str:
-        return self.name
 
 
 class PlanetariumDone(models.Model):
