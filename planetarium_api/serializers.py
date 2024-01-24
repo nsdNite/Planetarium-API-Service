@@ -8,7 +8,7 @@ from planetarium_api.models import (
     Reservation,
     ShowSession,
     ShowTheme,
-    Ticket
+    Ticket,
 )
 
 
@@ -81,17 +81,13 @@ class AstronomyShowListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AstronomyShow
-        fields = (
-            "id",
-            "title",
-            "description",
-            "show_theme"
-        )
+        fields = ("id", "title", "description", "show_theme")
 
 
 class AstronomyShowDetailSerializer(serializers.ModelSerializer):
     show_theme = ShowThemeSerializer(
-        many=True, read_only=True,
+        many=True,
+        read_only=True,
     )
 
     class Meta:
@@ -107,13 +103,7 @@ class AstronomyShowDetailSerializer(serializers.ModelSerializer):
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlanetariumDome
-        fields = (
-            "id",
-            "name",
-            "rows",
-            "seats_in_row",
-            "capacity"
-        )
+        fields = ("id", "name", "rows", "seats_in_row", "capacity")
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -154,11 +144,7 @@ class TicketSeatsSerializer(TicketSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    tickets = TicketSerializer(
-        many=True,
-        read_only=False,
-        allow_empty=False
-    )
+    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
 
     class Meta:
         model = Reservation
@@ -173,10 +159,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             tickets_data = validated_data.pop("tickets")
             reservation = Reservation.objects.create(**validated_data)
             for ticket_data in tickets_data:
-                Ticket.objects.create(
-                    reservation=reservation,
-                    **ticket_data
-                )
+                Ticket.objects.create(reservation=reservation, **ticket_data)
             return reservation
 
 

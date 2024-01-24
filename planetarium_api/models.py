@@ -13,7 +13,9 @@ class ShowTheme(models.Model):
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    show_theme = models.ManyToManyField(ShowTheme, blank=True, related_name="astronomy_shows")
+    show_theme = models.ManyToManyField(
+        ShowTheme, blank=True, related_name="astronomy_shows"
+    )
 
     class Meta:
         ordering = ["title"]
@@ -36,8 +38,13 @@ class PlanetariumDome(models.Model):
 
 
 class ShowSession(models.Model):
-    astronomy_show = models.ForeignKey(AstronomyShow, on_delete=models.CASCADE)
-    planetarium_dome = models.ForeignKey(PlanetariumDome, on_delete=models.CASCADE)
+    astronomy_show = models.ForeignKey(
+        AstronomyShow,
+        on_delete=models.CASCADE
+    )
+    planetarium_dome = models.ForeignKey(
+        PlanetariumDome, on_delete=models.CASCADE
+    )
     show_time = models.DateTimeField()
 
     class Meta:
@@ -62,19 +69,16 @@ class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
     show_session = models.ForeignKey(
-        ShowSession,
-        on_delete=models.CASCADE,
-        related_name="tickets"
+        ShowSession, on_delete=models.CASCADE, related_name="tickets"
     )
     reservation = models.ForeignKey(
-        Reservation,
-        on_delete=models.CASCADE,
-        related_name="tickets"
+        Reservation, on_delete=models.CASCADE, related_name="tickets"
     )
 
     @staticmethod
     def validate_ticket(row, seat, planetarium_dome, error_to_raise):
-        for ticket_attr_value, ticket_attr_name, planetarium_dome_attr_name in [
+        for (ticket_attr_value, ticket_attr_name,
+             planetarium_dome_attr_name) in [
             (row, "row", "rows"),
             (seat, "seat", "seats_in_row"),
         ]:
@@ -83,9 +87,9 @@ class Ticket(models.Model):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                                          f"number must be in available range: "
-                                          f"(1, {planetarium_dome_attr_name}): "
-                                          f"(1, {count_attrs})"
+                        f"number must be in available range: "
+                        f"(1, {planetarium_dome_attr_name}): "
+                        f"(1, {count_attrs})"
                     }
                 )
 
@@ -98,11 +102,11 @@ class Ticket(models.Model):
         )
 
     def save(
-            self,
-            force_insert=False,
-            force_update=False,
-            using=None,
-            update_fields=None,
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
         self.full_clean()
         return super(Ticket, self).save(
@@ -110,9 +114,7 @@ class Ticket(models.Model):
         )
 
     def __str__(self):
-        return (
-            f"{str(self.show_session)} (row: {self.row}, seat: {self.seat})"
-        )
+        return f"{str(self.show_session)} (row: {self.row}, seat: {self.seat})"
 
     class Meta:
         unique_together = ("show_session", "row", "seat")
