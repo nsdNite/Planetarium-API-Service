@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db.models import F, Count
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -63,6 +64,25 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
             return AstronomyShowDetailSerializer
 
         return AstronomyShowSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "title",
+                type=str,
+                description="Filter by title name (example ?title=Mars)",
+                required=False,
+            ),
+            OpenApiParameter(
+                "show_themes",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter by show theme id (example ?show_themes=1,3)",
+                required=False,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class ShowThemeViewSet(viewsets.ModelViewSet):

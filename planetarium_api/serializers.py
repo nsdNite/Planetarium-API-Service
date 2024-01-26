@@ -42,7 +42,7 @@ class ShowSessionListSerializer(ShowSessionSerializer):
         read_only=True,
     )
     planetarium_dome_capacity = serializers.IntegerField(
-        source="planetarium_dome_capacity",
+        source="planetarium_dome.capacity",
         read_only=True,
     )
     tickets_available = serializers.IntegerField(
