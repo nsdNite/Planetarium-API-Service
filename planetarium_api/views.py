@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import F, Count
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 
 from planetarium_api.models import (
     AstronomyShow,
@@ -10,8 +11,9 @@ from planetarium_api.models import (
     Reservation,
     ShowSession,
     ShowTheme,
-    Ticket,
 )
+
+from planetarium_api.permissions import IsAdminOrIfAuthenticatedReadOnly
 
 from planetarium_api.serializers import (
     ShowThemeSerializer,
@@ -22,7 +24,6 @@ from planetarium_api.serializers import (
     AstronomyShowListSerializer,
     AstronomyShowDetailSerializer,
     PlanetariumDomeSerializer,
-    TicketSerializer,
     ReservationSerializer,
     ReservationListSerializer,
 )
@@ -31,6 +32,7 @@ from planetarium_api.serializers import (
 class AstronomyShowViewSet(viewsets.ModelViewSet):
     queryset = AstronomyShow.objects.prefetch_related("show_theme")
     serializer_class = AstronomyShowSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
     def _params_to_ints(qs):
@@ -66,11 +68,13 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
 class ShowThemeViewSet(viewsets.ModelViewSet):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     queryset = PlanetariumDome.objects.all()
     serializer_class = PlanetariumDomeSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
@@ -79,13 +83,14 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         .select_related("astronomy_show", "planetarium_dome")
         .annotate(
             tickets_available=(
-                F("planetarium_dome__rows")
-                * F("planetarium_dome__seats_in_row")
-                - Count("tickets")
+                    F("planetarium_dome__rows")
+                    * F("planetarium_dome__seats_in_row")
+                    - Count("tickets")
             )
         )
     )
     serializer_class = ShowSessionSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         date = self.request.query_params.get("date")
@@ -114,11 +119,6 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return ShowSessionSerializer
 
 
-class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
-
-
 class ReservationPagination(PageNumberPagination):
     page_size = 20
     max_page_size = 100
@@ -131,6 +131,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
     )
     serializer_class = ReservationSerializer
     pagination_class = ReservationPagination
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user)
