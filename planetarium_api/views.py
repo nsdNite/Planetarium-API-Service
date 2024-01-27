@@ -31,7 +31,7 @@ from planetarium_api.serializers import (
 
 
 class AstronomyShowViewSet(viewsets.ModelViewSet):
-    queryset = AstronomyShow.objects.prefetch_related("show_theme")
+    queryset = AstronomyShow.objects.prefetch_related("show_themes")
     serializer_class = AstronomyShowSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
@@ -43,7 +43,7 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Retrieve show with filters"""
         title = self.request.query_params.get("title")
-        show_themes = self.request.query_params.get("show_theme")
+        show_themes = self.request.query_params.get("show_themes")
 
         queryset = self.queryset
 
