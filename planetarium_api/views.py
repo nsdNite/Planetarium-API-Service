@@ -96,6 +96,30 @@ class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     serializer_class = PlanetariumDomeSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
+    def get_queryset(self):
+        """Retrieve Planetarium Dome with name filter"""
+        name = self.request.query_params.get("name")
+
+        queryset = self.queryset
+
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "name",
+                type=str,
+                description="Filter by dome name (example ?title=NASA)",
+                required=False,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
     queryset = (
