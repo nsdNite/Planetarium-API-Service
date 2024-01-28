@@ -76,7 +76,8 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "show_themes",
                 type={"type": "list", "items": {"type": "number"}},
-                description="Filter by show theme id (example ?show_themes=1,3)",
+                description="Filter by show theme id"
+                            " (example ?show_themes=1,3)",
                 required=False,
             ),
         ]

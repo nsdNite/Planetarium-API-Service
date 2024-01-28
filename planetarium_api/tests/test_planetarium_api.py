@@ -60,7 +60,10 @@ def sample_show_session(**params):
 
 def detail_url(astronomyshow_id):
     """Retrieve URL of an AstronomyShow instance by id"""
-    return reverse("planetarium_api:astronomyshow-detail", args=[astronomyshow_id])
+    return reverse(
+        "planetarium_api:astronomyshow-detail",
+        args=[astronomyshow_id]
+    )
 
 
 class UnauthenticatedPlanetariumApiTests(TestCase):
@@ -94,7 +97,9 @@ class AuthenticatedPlanetariumApiTests(TestCase):
 
     def test_filter_astronomy_shows_by_title(self):
         show_first = sample_astronomy_show(title="Test 1")
-        show_second = sample_astronomy_show(title="Test 2: First steps on Moon")
+        show_second = sample_astronomy_show(
+            title="Test 2: First steps on Moon"
+        )
         show_third = sample_astronomy_show(title="REST 3: Life on Mars")
 
         res = self.client.get(SHOW_URL, {"title": "test"})
@@ -109,7 +114,9 @@ class AuthenticatedPlanetariumApiTests(TestCase):
 
     def test_filter_show_by_theme(self):
         show_first = sample_astronomy_show(title="Test 1")
-        show_second = sample_astronomy_show(title="Test 2: First steps on Moon")
+        show_second = sample_astronomy_show(
+            title="Test 2: First steps on Moon"
+        )
         show_third = sample_astronomy_show(title="REST 3: Life on Mars")
 
         theme_first = sample_show_theme(name="Test Theme 1")
@@ -118,7 +125,12 @@ class AuthenticatedPlanetariumApiTests(TestCase):
         show_first.show_themes.add(theme_first)
         show_second.show_themes.add(theme_second)
 
-        res = self.client.get(SHOW_URL, {"show_themes": f"{theme_first.id},{theme_second.id}"})
+        res = self.client.get(
+            SHOW_URL,
+            {
+                "show_themes": f"{theme_first.id},{theme_second.id}"
+            }
+        )
         serializer_first = AstronomyShowListSerializer(show_first)
         serializer_second = AstronomyShowListSerializer(show_second)
         serializer_third = AstronomyShowListSerializer(show_third)
